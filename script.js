@@ -28,6 +28,20 @@ function operate(operator, firstNumber, secondNumber) {
     }
 }
 
-let firstNumber = null;
-let secondNumber = null;
-let operator = null;
+function storeNumber(event) {
+    number = event.target.dataset.number;
+    if (number) {
+        document.querySelector(".display").textContent += number;
+        firstNumber += number;
+    }
+}
+
+let firstNumber = "";
+let secondNumber = "";
+let operator = "";
+
+// Create an event listener for all number buttons on the calculator.
+const buttons = document.querySelectorAll(".number.button");
+buttons.forEach((button) => {
+    button.addEventListener("click", (event) => storeNumber(event))
+})
