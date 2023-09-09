@@ -36,6 +36,9 @@ function updateDisplay(value, type) {
     if (type === "reset") {
         display.textContent = "";
     }
+    else if (type === "result" && value === Infinity) {
+        display.textContent = "Error - You cannot divide by zero!";
+    }
     // Print result to screen.
     else if (type === "result")
     {
@@ -75,6 +78,7 @@ function resetCalcVariables() {
     secondNumber = "";
     operator = "";
     firstNumberStored = false;
+    operatorLocked = false;
     updateDisplay(null, "reset");
 }
 
@@ -102,6 +106,7 @@ let secondNumber = "";
 let operator = "";
 let firstNumberStored = false;
 let resultStored = false;
+let operatorLocked = false;
 
 // Create an event listener for all number buttons on the calculator.
 const numberButtons = document.querySelectorAll(".number.button");
@@ -131,7 +136,7 @@ operatorButtons.forEach((button) => {
         if (firstNumber && secondNumber) {
             firstNumber = getResult();
         }
-        if (firstNumber && !secondNumber) {
+        if (firstNumber && !secondNumber && !operatorLocked) {
             operator = storeOperator(event);
 
             // Update boolean to indicate first number has been stored.
@@ -148,6 +153,9 @@ equalsButton.addEventListener("click", () => {
         // Allow carryover of result to first number variable, and reset second number to prepare 
         // for next sequential expression.
         firstNumber = getResult();
+
+        // If divided by zero, do not allow any further operators to be typed.
+        if (firstNumber === Infinity) operatorLocked = true;
 })
 
 const clearButton = document.querySelector("#clear");
