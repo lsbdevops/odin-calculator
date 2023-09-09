@@ -113,6 +113,12 @@ numberButtons.forEach((button) => {
         else if (!resultStored) {
             secondNumber += storeNumber(event);
         }
+        // If number button is pressed directly after result is displayed,
+        // start a new calculation with the number input.
+        else {
+            resetCalcVariables();
+            firstNumber += storeNumber(event);
+        }
     })
 })
 
@@ -120,6 +126,11 @@ numberButtons.forEach((button) => {
 const operatorButtons = document.querySelectorAll(".operator.button");
 operatorButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
+        // If there's an input for both first and second numbers in the expression, evaluate
+        // the result first.
+        if (firstNumber && secondNumber) {
+            firstNumber = getResult();
+        }
         if (firstNumber && !secondNumber) {
             operator = storeOperator(event);
 
