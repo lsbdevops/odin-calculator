@@ -74,7 +74,7 @@ function resetCalcVariables() {
     firstNumber = "";
     secondNumber = "";
     operator = "";
-    storeFirstNumber = true;
+    firstNumberStored = false;
     updateDisplay(null, "reset");
 }
 
@@ -88,6 +88,7 @@ function getResult() {
         // Reset second number and operator variables
         secondNumber = "";
         operator = "";
+        resultStored = true;
         return result;    
     }
 
@@ -99,16 +100,17 @@ function getResult() {
 let firstNumber = "";
 let secondNumber = "";
 let operator = "";
-let storeFirstNumber = true;
+let firstNumberStored = false;
+let resultStored = false;
 
 // Create an event listener for all number buttons on the calculator.
 const numberButtons = document.querySelectorAll(".number.button");
 numberButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-        if (storeFirstNumber) {
+        if (!firstNumberStored) {
             firstNumber += storeNumber(event);
         }
-        else {
+        else if (!resultStored) {
             secondNumber += storeNumber(event);
         }
     })
@@ -121,8 +123,11 @@ operatorButtons.forEach((button) => {
         if (firstNumber && !secondNumber) {
             operator = storeOperator(event);
 
-            // Update boolean so the second number will be stored.
-            storeFirstNumber = false;
+            // Update boolean to indicate first number has been stored.
+            firstNumberStored = true;
+
+            // Reset boolean to indicate result is no longer stored.
+            resultStored = false;
         }
     })
 })
