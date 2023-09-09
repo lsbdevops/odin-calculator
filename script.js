@@ -78,6 +78,24 @@ function resetCalcVariables() {
     updateDisplay(null, "reset");
 }
 
+function getResult() {
+    // Check that the full expression exists before finding the result.
+    if (operator && firstNumber && secondNumber) {
+        // Get and print the result of expression - convert string variables storing numbers to numbers.
+        const result = operate(operator, +firstNumber, +secondNumber);
+        updateDisplay(result, "result");
+        
+        // Reset second number and operator variables
+        secondNumber = "";
+        operator = "";
+        return result;    
+    }
+
+    // Otherwise return first number unchanged.
+    return firstNumber;
+}
+
+
 let firstNumber = "";
 let secondNumber = "";
 let operator = "";
@@ -100,7 +118,7 @@ numberButtons.forEach((button) => {
 const operatorButtons = document.querySelectorAll(".operator.button");
 operatorButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-        if (!secondNumber) {
+        if (firstNumber && !secondNumber) {
             operator = storeOperator(event);
 
             // Update boolean so the second number will be stored.
@@ -110,23 +128,14 @@ operatorButtons.forEach((button) => {
 })
 
 const equalsButton = document.querySelector("#equals");
-equalsButton.addEventListener("click", (event) => {
-    // Check that the full expression exists before finding the result.
-    if (operator && firstNumber && secondNumber) {
-        // Print the result of expression - convert string variables storing numbers to numbers.
-        const result = operate(operator, +firstNumber, +secondNumber);
-        updateDisplay(result, "result");
-
+equalsButton.addEventListener("click", () => {
         // Allow carryover of result to first number variable, and reset second number to prepare 
-        //for next sequential expression.
-        firstNumber = result;
-        secondNumber = "";
-        operator = "";
-    }
+        // for next sequential expression.
+        firstNumber = getResult();
 })
 
 const clearButton = document.querySelector("#clear");
-clearButton.addEventListener("click", (event) => {
+clearButton.addEventListener("click", () => {
     // Reset the calculation variables, and clear display.
     resetCalcVariables();
 })
