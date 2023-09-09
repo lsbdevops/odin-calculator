@@ -43,11 +43,11 @@ function updateDisplay(value, type) {
     }
     // If the character is a number, or an operator and an operator is not currently displayed, 
     // concatenate the character to the displayed text.
-    else if ((type === "number") || (type === "operator" && storeFirstNumber)) {
+    else if ((type === "number") || (type === "operator" && !operator)) {
         display.textContent += value;
     }
     // Check if the character is an operator and needs to 'overwrite' the currently displayed operator.
-    else if (type === "operator" && secondNumber === "") {
+    else if (type === "operator" && operator) {
         display.textContent = display.textContent.slice(0, -1) + value;
     }
 }
@@ -114,6 +114,12 @@ equalsButton.addEventListener("click", (event) => {
     // Print the result of expression - convert string variables storing numbers to numbers.
     const result = operate(operator, +firstNumber, +secondNumber);
     updateDisplay(result, "result");
+
+    // Allow carryover of result to first number variable, and reset second number to prepare 
+    //for next sequential expression.
+    firstNumber = result;
+    secondNumber = "";
+    operator = "";
 })
 
 const clearButton = document.querySelector("#clear");
