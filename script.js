@@ -111,15 +111,18 @@ operatorButtons.forEach((button) => {
 
 const equalsButton = document.querySelector("#equals");
 equalsButton.addEventListener("click", (event) => {
-    // Print the result of expression - convert string variables storing numbers to numbers.
-    const result = operate(operator, +firstNumber, +secondNumber);
-    updateDisplay(result, "result");
+    // Check that the full expression exists before finding the result.
+    if (operator && firstNumber && secondNumber) {
+        // Print the result of expression - convert string variables storing numbers to numbers.
+        const result = operate(operator, +firstNumber, +secondNumber);
+        updateDisplay(result, "result");
 
-    // Allow carryover of result to first number variable, and reset second number to prepare 
-    //for next sequential expression.
-    firstNumber = result;
-    secondNumber = "";
-    operator = "";
+        // Allow carryover of result to first number variable, and reset second number to prepare 
+        //for next sequential expression.
+        firstNumber = result;
+        secondNumber = "";
+        operator = "";
+    }
 })
 
 const clearButton = document.querySelector("#clear");
