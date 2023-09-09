@@ -28,18 +28,22 @@ function operate(operator, firstNumber, secondNumber) {
     }
 }
 
-function display(character, type) {
+function updateDisplay(value, type) {
     // Get display element.
     const display = document.querySelector(".display");
 
     // If the character is a number, or an operator and an operator is not currently displayed, 
     // concatenate the character to the displayed text.
-    if ((type === "number") || (type === "operator" && storeFirstNumber)) {
-        display.textContent += character;
+    if (type === "result")
+    {
+        display.textContent = value;
     }
-    // Otherwise, the character is an operator and needs to 'overwrite' the currently displayed operator.
-    else {
-        display.textContent = display.textContent.slice(0, -1) + character;
+    if ((type === "number") || (type === "operator" && storeFirstNumber)) {
+        display.textContent += value;
+    }
+    // Check if the character is an operator and needs to 'overwrite' the currently displayed operator.
+    else if (type === "operator" && secondNumber === "") {
+        display.textContent = display.textContent.slice(0, -1) + value;
     }
 }
 
@@ -47,7 +51,7 @@ function storeNumber(event) {
     const number = event.target.dataset.number;
     // Confirm a character was returned, update display and return value.
     if (number) {
-        display(number, "number");
+        updateDisplay(number, "number");
         return number;
     }
 }
@@ -56,7 +60,7 @@ function storeOperator(event) {
     const operator =  event.target.dataset.operator;
     // Confirm a character was returned, update display and return value.
     if (operator) {
-        display(operator, "operator");
+        updateDisplay(operator, "operator");
         return operator;
     }
 }
@@ -88,4 +92,10 @@ operatorButtons.forEach((button) => {
         // Update boolean so the second number will be stored.
         storeFirstNumber = false;
     })
+})
+
+const equalsButton = document.querySelector("#equals");
+equalsButton.addEventListener("click", (event) => {
+    const result = operate(operator, +firstNumber, +secondNumber);
+    updateDisplay(result, "result");
 })
