@@ -32,13 +32,18 @@ function updateDisplay(value, type) {
     // Get display element.
     const display = document.querySelector(".display");
 
-    // If the character is a number, or an operator and an operator is not currently displayed, 
-    // concatenate the character to the displayed text.
-    if (type === "result")
+    // Clear the display.
+    if (type === "reset") {
+        display.textContent = "";
+    }
+    // Print result to screen.
+    else if (type === "result")
     {
         display.textContent = value;
     }
-    if ((type === "number") || (type === "operator" && storeFirstNumber)) {
+    // If the character is a number, or an operator and an operator is not currently displayed, 
+    // concatenate the character to the displayed text.
+    else if ((type === "number") || (type === "operator" && storeFirstNumber)) {
         display.textContent += value;
     }
     // Check if the character is an operator and needs to 'overwrite' the currently displayed operator.
@@ -63,6 +68,13 @@ function storeOperator(event) {
         updateDisplay(operator, "operator");
         return operator;
     }
+}
+
+function resetCalcVariables() {
+    firstNumber = "";
+    secondNumber = "";
+    operator = "";
+    storeFirstNumber = true;
 }
 
 let firstNumber = "";
@@ -96,6 +108,14 @@ operatorButtons.forEach((button) => {
 
 const equalsButton = document.querySelector("#equals");
 equalsButton.addEventListener("click", (event) => {
+    // Print the result of expression - convert string variables storing numbers to numbers.
     const result = operate(operator, +firstNumber, +secondNumber);
     updateDisplay(result, "result");
+})
+
+const clearButton = document.querySelector("#clear");
+clearButton.addEventListener("click", (event) => {
+    // Reset the calculation variables, and clear display.
+    resetCalcVariables();
+    updateDisplay(null, "reset");
 })
