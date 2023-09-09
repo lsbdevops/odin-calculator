@@ -56,13 +56,26 @@ html, body {
     min-height: 400px;
 }
 
-.button {
+.top-buttons-container {
+    min-width: 400px;
+    min-height: 50px;
+}
+
+.button, .top-button {
     display: flex;
     justify-content: center;
     align-items: center;
     flex: 1 1 100%;
     border: 1px solid;
+    font-size: 28px;
+}
+
+.button {
     max-width: 80px;
     aspect-ratio: 1/1;
-    font-size: 28px;
+}
+
+.top-button {
+    max-width: 150px;
+    height: 50px;
 }
