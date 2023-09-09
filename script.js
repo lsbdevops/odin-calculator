@@ -28,20 +28,32 @@ function operate(operator, firstNumber, secondNumber) {
     }
 }
 
+function display(character) {
+    document.querySelector(".display").textContent += character;
+}
+
 function storeNumber(event) {
     number = event.target.dataset.number;
     if (number) {
-        document.querySelector(".display").textContent += number;
-        firstNumber += number;
+        display(number);
+        return number;
     }
 }
 
 let firstNumber = "";
 let secondNumber = "";
 let operator = "";
+let storeFirstNumber = true;
 
 // Create an event listener for all number buttons on the calculator.
 const buttons = document.querySelectorAll(".number.button");
 buttons.forEach((button) => {
-    button.addEventListener("click", (event) => storeNumber(event))
+    button.addEventListener("click", (event) => {
+        if (storeFirstNumber) {
+            firstNumber += storeNumber(event);
+        }
+        else {
+            secondNumber += storeNumber(event);
+        }
+    })
 })
