@@ -32,28 +32,20 @@ function updateDisplay(operator, firstNumber, secondNumber) {
     // Get display element.
     const display = document.querySelector(".display"); 
 
-    // Update the display with the current input.
+    // Update the display text with the current input.
     display.textContent = `${firstNumber} ${operator} ${secondNumber}`;
 }
 
-function storeNumber(event) {
-    const number = event.target.dataset.number;
-    // Check if the input is a decimal point and confirm no decimal point is already present.
-    if (number === "." && decimalStored) return "";
-    // Confirm a character was returned, update display and return value.
-    if (number) {
-        // If the input is a decimal point, update the boolean variable.
-        if (number === ".") decimalStored = true;
-        return number;
-    }
-}
+function getButtonValue(event) {
+    const buttonValue = event.target.dataset.value;
 
-function storeOperator(event) {
-    const operator =  event.target.dataset.operator;
-    // Confirm a character was returned, update display and return value.
-    if (operator) {
-        return operator;
-    }
+    // Check if the input is a decimal point and confirm no decimal point is already present.
+    if (buttonValue === "." && decimalPresent) return "";
+
+    // If the input is a decimal point, update the boolean variable.
+    if (buttonValue === ".") decimalPresent = true;
+
+    return buttonValue;
 }
 
 function resetCalcVariables() {
@@ -62,7 +54,7 @@ function resetCalcVariables() {
     operator = "";
     firstNumberStored = false;
     operatorLocked = false;
-    decimalStored = false;
+    decimalPresent = false;
     updateDisplay(operator, firstNumber, secondNumber);
 }
 
@@ -81,7 +73,7 @@ function getResult() {
         secondNumber = "";
         operator = "";
         resultStored = true;
-        decimalStored = false;
+        decimalPresent = false;
 
         // Convert result back to a string so string methods may be used.
         return result.toString();    
@@ -98,23 +90,23 @@ let operator = "";
 let firstNumberStored = false;
 let resultStored = false;
 let operatorLocked = false;
-let decimalStored = false;
+let decimalPresent = false;
 
 // Create an event listener for all number buttons on the calculator.
 const numberButtons = document.querySelectorAll(".number.button");
 numberButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
         if (!firstNumberStored) {
-            firstNumber += storeNumber(event);
+            firstNumber += getButtonValue(event);
         }
         else if (!resultStored) {
-            secondNumber += storeNumber(event);
+            secondNumber += getButtonValue(event);
         }
         // If number button is pressed directly after result is displayed,
         // start a new calculation with the number input.
         else {
             resetCalcVariables();
-            firstNumber += storeNumber(event);
+            firstNumber += getButtonValue(event);
         }
 
         updateDisplay(operator, firstNumber, secondNumber);
@@ -131,7 +123,7 @@ operatorButtons.forEach((button) => {
             firstNumber = getResult();
         }
         if (firstNumber && !secondNumber && !operatorLocked) {
-            operator = storeOperator(event);
+            operator = getButtonValue(event);
 
             // Update boolean to indicate first number has been stored.
             firstNumberStored = true;
@@ -140,7 +132,7 @@ operatorButtons.forEach((button) => {
             resultStored = false;
 
             // Reset boolean to indicate a decimal point is no longer stored.
-            decimalStored = false;
+            decimalPresent = false;
         }
 
         updateDisplay(operator, firstNumber, secondNumber);
