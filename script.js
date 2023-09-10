@@ -48,6 +48,41 @@ function getButtonValue(event) {
     return buttonValue;
 }
 
+function updateNumberVariable(event) {
+    if (!firstNumberStored) {
+        firstNumber += getButtonValue(event);
+    }
+    else if (!resultStored) {
+        secondNumber += getButtonValue(event);
+    }
+    // If number button is pressed directly after result is displayed,
+    // start a new calculation with the number input.
+    else {
+        resetCalcVariables();
+        firstNumber += getButtonValue(event);
+    }
+}
+
+function updateOperatorVariable(event) {
+    // If there's an input for both first and second numbers in the expression, evaluate
+    // the result first.
+    if (firstNumber && secondNumber) {
+        firstNumber = getResult();
+    }
+    if (firstNumber && !secondNumber && !operatorLocked) {
+        operator = getButtonValue(event);
+
+        // Update boolean to indicate first number has been stored.
+        firstNumberStored = true;
+
+        // Reset boolean to indicate result is no longer stored.
+        resultStored = false;
+
+        // Reset boolean to indicate a decimal point is no longer stored.
+        decimalPresent = false;
+    }
+}
+
 function resetCalcVariables() {
     firstNumber = "";
     secondNumber = "";
@@ -55,7 +90,6 @@ function resetCalcVariables() {
     firstNumberStored = false;
     operatorLocked = false;
     decimalPresent = false;
-    updateDisplay(operator, firstNumber, secondNumber);
 }
 
 function getResult() {
@@ -83,7 +117,7 @@ function getResult() {
     return firstNumber;
 }
 
-
+// Declare initial values for variables required.
 let firstNumber = "";
 let secondNumber = "";
 let operator = "";
@@ -96,19 +130,7 @@ let decimalPresent = false;
 const numberButtons = document.querySelectorAll(".number.button");
 numberButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-        if (!firstNumberStored) {
-            firstNumber += getButtonValue(event);
-        }
-        else if (!resultStored) {
-            secondNumber += getButtonValue(event);
-        }
-        // If number button is pressed directly after result is displayed,
-        // start a new calculation with the number input.
-        else {
-            resetCalcVariables();
-            firstNumber += getButtonValue(event);
-        }
-
+        updateNumberVariable(event);
         updateDisplay(operator, firstNumber, secondNumber);
     })
 })
@@ -117,24 +139,7 @@ numberButtons.forEach((button) => {
 const operatorButtons = document.querySelectorAll(".operator.button");
 operatorButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-        // If there's an input for both first and second numbers in the expression, evaluate
-        // the result first.
-        if (firstNumber && secondNumber) {
-            firstNumber = getResult();
-        }
-        if (firstNumber && !secondNumber && !operatorLocked) {
-            operator = getButtonValue(event);
-
-            // Update boolean to indicate first number has been stored.
-            firstNumberStored = true;
-
-            // Reset boolean to indicate result is no longer stored.
-            resultStored = false;
-
-            // Reset boolean to indicate a decimal point is no longer stored.
-            decimalPresent = false;
-        }
-
+        updateOperatorVariable(event);
         updateDisplay(operator, firstNumber, secondNumber);
     })
 })
@@ -154,4 +159,5 @@ const clearButton = document.querySelector("#clear");
 clearButton.addEventListener("click", () => {
     // Reset the calculation variables, and clear display.
     resetCalcVariables();
+    updateDisplay(operator, firstNumber, secondNumber);
 })
