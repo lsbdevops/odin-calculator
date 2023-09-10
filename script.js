@@ -28,69 +28,72 @@ function operate(operator, firstNumber, secondNumber) {
     }
 }
 
-function updateDisplay(operator, firstNumber, secondNumber) {
+function updateDisplay() {
     // Get display element.
     const display = document.querySelector(".display"); 
 
     // Check if user has divided by zero.
-    if (firstNumber === "Infinity") {
+    if (calculator.firstNumber === "Infinity") {
         display.textContent = "Error: Cannot divide by zero!";
     }
     // Update the display text with the current input.
-    else display.textContent = `${firstNumber} ${operator} ${secondNumber}`;
+    else display.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber}`;
 }
 
 function getButtonValue(event) {
-    const buttonValue = event.target.dataset.value;
-
-    return buttonValue;
+    return event.target.dataset.value;
 }
 
 function updateNumberVariable(event) {
-    if (!firstNumberStored) {
-        firstNumber += getButtonValue(event);
+    if (!calculator.firstNumberStored) {
+        calculator.firstNumber += getButtonValue(event);
     }
-    else if (!resultStored) {
-        secondNumber += getButtonValue(event);
+    else if (!calculator.resultStored) {
+        calculator.secondNumber += getButtonValue(event);
     }
     // If number button is pressed directly after result is displayed,
     // start a new calculation with the number input.
     else {
-        resetCalcVariables();
-        firstNumber += getButtonValue(event);
+        resetCalcVariables(true);
+        calculator.firstNumber += getButtonValue(event);
     }
 }
 
 function updateOperatorVariable(event) {
     // If there's an input for both first and second numbers in the expression, evaluate
     // the result first.
-    if (firstNumber && secondNumber) {
-        firstNumber = getResult();
+    if (calculator.firstNumber && calculator.secondNumber) {
+        [calculator.firstNumber, calculator.resultStored] = getResult(calculator.operator, 
+            calculator.firstNumber, calculator.secondNumber);
     }
-    if (firstNumber && !secondNumber && !operatorLocked) {
-        operator = getButtonValue(event);
+    if (calculator.firstNumber && !calculator.secondNumber && !calculator.operatorLocked) {
+        calculator.operator = getButtonValue(event);
 
         // Update boolean to indicate first number has been stored.
-        firstNumberStored = true;
+        calculator.firstNumberStored = true;
 
         // Reset boolean to indicate result is no longer stored.
-        resultStored = false;
+        calculator.resultStored = false;
 
         // Reset boolean to indicate a decimal point is no longer stored.
-        decimalPresent = false;
+        calculator.decimalPresent = false;
     }
 }
 
-function resetCalcVariables() {
-    firstNumber = "";
-    secondNumber = "";
-    operator = "";
-    firstNumberStored = false;
-    operatorLocked = false;
-    decimalPresent = false;
+function resetCalcVariables(fullReset) {
+    calculator.secondNumber = "";
+    calculator.operator = "";
+    calculator.decimalPresent = false;
+
+    if (fullReset) {
+        calculator.firstNumber = "";
+        calculator.firstNumberStored = false;
+        calculator.operatorLocked = false;
+    }
+
 }
 
-function getResult() {
+function getResult(operator, firstNumber, secondNumber) {
     // Check that the full expression exists before finding the result.
     if (operator && firstNumber && secondNumber) {
         // If either number ends with a decimal point, update the number by concatenating a zero at the end.
@@ -104,35 +107,34 @@ function getResult() {
         // Get and print the result of expression - convert string variables storing to numbers.
         const result = operate(operator, +firstNumber, +secondNumber);
         
-        // Reset second number and operator variables
-        secondNumber = "";
-        operator = "";
-        resultStored = true;
-        decimalPresent = false;
+        // Reset second number, operator and decimal boolean variables.
+        resetCalcVariables(false);
 
-        // Convert result back to a string so string methods may be used.
-        return result.toString();    
+        // Convert result back to a string so string methods may be used. Confirm result was stored.
+        return [result.toString(), true];    
     }
 
     // Otherwise return first number unchanged.
     return firstNumber;
 }
 
-// Declare initial values for variables required.
-let firstNumber = "";
-let secondNumber = "";
-let operator = "";
-let firstNumberStored = false;
-let resultStored = false;
-let operatorLocked = false;
-let decimalPresent = false;
+// Declare initial values for variables required in an object.
+const calculator = {
+    firstNumber: "",
+    secondNumber: "",
+    operator: "",
+    firstNumberStored: false,
+    resultStored: false,
+    operatorLocked: false,
+    decimalPresent: false,
+}
 
 // Create an event listener for all number buttons on the calculator.
 const numberButtons = document.querySelectorAll(".number.button");
 numberButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
         updateNumberVariable(event);
-        updateDisplay(operator, firstNumber, secondNumber);
+        updateDisplay();
     })
 })
 
@@ -141,35 +143,37 @@ const operatorButtons = document.querySelectorAll(".operator.button");
 operatorButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
         updateOperatorVariable(event);
-        updateDisplay(operator, firstNumber, secondNumber);
+        updateDisplay();
     })
 })
 
 const equalsButton = document.querySelector("#equals");
 equalsButton.addEventListener("click", () => {
-        // Allow carryover of result to first number variable, and reset second number to prepare 
-        // for next sequential expression.
-        firstNumber = getResult();
-        updateDisplay(operator, firstNumber, secondNumber);
+        // Allow carryover of result to first number variable and update display.
+        [calculator.firstNumber, calculator.resultStored] = getResult(calculator.operator, 
+            calculator.firstNumber, calculator.secondNumber);
+        updateDisplay();
 
         // If divided by zero, do not allow any further operators to be typed.
-        if (firstNumber === "Infinity") operatorLocked = true;
+        if (calculator.firstNumber === "Infinity") {
+            calculator.operatorLocked = true;
+        }
 })
 
 const clearButton = document.querySelector("#clear");
 clearButton.addEventListener("click", () => {
     // Reset the calculation variables, and clear display.
-    resetCalcVariables();
-    updateDisplay(operator, firstNumber, secondNumber);
+    resetCalcVariables(true);
+    updateDisplay();
 })
 
 
 const decimalButton = document.querySelector("#decimal");
 decimalButton.addEventListener("click", (event) => {
     // Confirm no decimal point is already present in the current number.
-    if (!decimalPresent) {
+    if (!calculator.decimalPresent) {
         updateNumberVariable(event);
-        updateDisplay(operator, firstNumber, secondNumber);
-        decimalPresent = true;
+        updateDisplay();
+        calculator.decimalPresent = true;
     }
 })
