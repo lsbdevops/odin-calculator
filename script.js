@@ -28,31 +28,12 @@ function operate(operator, firstNumber, secondNumber) {
     }
 }
 
-function updateDisplay(value, type) {
+function updateDisplay(operator, firstNumber, secondNumber) {
     // Get display element.
-    const display = document.querySelector(".display");
+    const display = document.querySelector(".display"); 
 
-    // Clear the display.
-    if (type === "reset") {
-        display.textContent = "";
-    }
-    else if (type === "result" && value === Infinity) {
-        display.textContent = "Error - You cannot divide by zero!";
-    }
-    // Print result to screen.
-    else if (type === "result")
-    {
-        display.textContent = value;
-    }
-    // If the character is a number, or an operator and an operator is not currently displayed, 
-    // concatenate the character to the displayed text.
-    else if ((type === "number") || (type === "operator" && !operator)) {
-        display.textContent += value;
-    }
-    // Check if the character is an operator and needs to 'overwrite' the currently displayed operator.
-    else if (type === "operator" && operator) {
-        display.textContent = display.textContent.slice(0, -1) + value;
-    }
+    // Update the display with the current input.
+    display.textContent = `${firstNumber} ${operator} ${secondNumber}`;
 }
 
 function storeNumber(event) {
@@ -61,7 +42,6 @@ function storeNumber(event) {
     if (number === "." && decimalStored) return "";
     // Confirm a character was returned, update display and return value.
     if (number) {
-        updateDisplay(number, "number");
         // If the input is a decimal point, update the boolean variable.
         if (number === ".") decimalStored = true;
         return number;
@@ -72,7 +52,6 @@ function storeOperator(event) {
     const operator =  event.target.dataset.operator;
     // Confirm a character was returned, update display and return value.
     if (operator) {
-        updateDisplay(operator, "operator");
         return operator;
     }
 }
@@ -84,7 +63,7 @@ function resetCalcVariables() {
     firstNumberStored = false;
     operatorLocked = false;
     decimalStored = false;
-    updateDisplay(null, "reset");
+    updateDisplay(operator, firstNumber, secondNumber);
 }
 
 function getResult() {
@@ -96,7 +75,7 @@ function getResult() {
 
         // Get and print the result of expression - convert string variables storing numbers to numbers.
         const result = operate(operator, +firstNumber, +secondNumber);
-        updateDisplay(result, "result");
+        updateDisplay(operator, firstNumber, secondNumber);
         
         // Reset second number and operator variables
         secondNumber = "";
@@ -137,6 +116,8 @@ numberButtons.forEach((button) => {
             resetCalcVariables();
             firstNumber += storeNumber(event);
         }
+
+        updateDisplay(operator, firstNumber, secondNumber);
     })
 })
 
@@ -161,6 +142,8 @@ operatorButtons.forEach((button) => {
             // Reset boolean to indicate a decimal point is no longer stored.
             decimalStored = false;
         }
+
+        updateDisplay(operator, firstNumber, secondNumber);
     })
 })
 
@@ -169,6 +152,7 @@ equalsButton.addEventListener("click", () => {
         // Allow carryover of result to first number variable, and reset second number to prepare 
         // for next sequential expression.
         firstNumber = getResult();
+        updateDisplay(operator, firstNumber, secondNumber);
 
         // If divided by zero, do not allow any further operators to be typed.
         if (firstNumber === Infinity) operatorLocked = true;
