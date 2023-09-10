@@ -39,12 +39,6 @@ function updateDisplay(operator, firstNumber, secondNumber) {
 function getButtonValue(event) {
     const buttonValue = event.target.dataset.value;
 
-    // Check if the input is a decimal point and confirm no decimal point is already present.
-    if (buttonValue === "." && decimalPresent) return "";
-
-    // If the input is a decimal point, update the boolean variable.
-    if (buttonValue === ".") decimalPresent = true;
-
     return buttonValue;
 }
 
@@ -101,7 +95,6 @@ function getResult() {
 
         // Get and print the result of expression - convert string variables storing numbers to numbers.
         const result = operate(operator, +firstNumber, +secondNumber);
-        updateDisplay(operator, firstNumber, secondNumber);
         
         // Reset second number and operator variables
         secondNumber = "";
@@ -160,4 +153,15 @@ clearButton.addEventListener("click", () => {
     // Reset the calculation variables, and clear display.
     resetCalcVariables();
     updateDisplay(operator, firstNumber, secondNumber);
+})
+
+
+const decimalButton = document.querySelector("#decimal");
+decimalButton.addEventListener("click", (event) => {
+    // Confirm no decimal point is already present.
+    if (!decimalPresent) {
+        updateNumberVariable(event);
+        updateDisplay(operator, firstNumber, secondNumber);
+        decimalPresent = true;
+    }
 })
