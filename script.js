@@ -57,9 +57,13 @@ function updateDisplay(value, type) {
 
 function storeNumber(event) {
     const number = event.target.dataset.number;
+    // Check if the input is a decimal point and confirm no decimal point is already present.
+    if (number === "." && decimalStored) return "";
     // Confirm a character was returned, update display and return value.
     if (number) {
         updateDisplay(number, "number");
+        // If the input is a decimal point, update the boolean variable.
+        if (number === ".") decimalStored = true;
         return number;
     }
 }
@@ -79,12 +83,17 @@ function resetCalcVariables() {
     operator = "";
     firstNumberStored = false;
     operatorLocked = false;
+    decimalStored = false;
     updateDisplay(null, "reset");
 }
 
 function getResult() {
     // Check that the full expression exists before finding the result.
     if (operator && firstNumber && secondNumber) {
+        // If either number ends with a decimal point, update the number by concatenating a zero at the end.
+        if (firstNumber.slice(-1) === ".") firstNumber += "0";
+        if (secondNumber.slice(-1) === ".") secondNumber += "0";
+
         // Get and print the result of expression - convert string variables storing numbers to numbers.
         const result = operate(operator, +firstNumber, +secondNumber);
         updateDisplay(result, "result");
@@ -93,7 +102,10 @@ function getResult() {
         secondNumber = "";
         operator = "";
         resultStored = true;
-        return result;    
+        decimalStored = false;
+
+        // Convert result back to a string so string methods may be used.
+        return result.toString();    
     }
 
     // Otherwise return first number unchanged.
@@ -107,6 +119,7 @@ let operator = "";
 let firstNumberStored = false;
 let resultStored = false;
 let operatorLocked = false;
+let decimalStored = false;
 
 // Create an event listener for all number buttons on the calculator.
 const numberButtons = document.querySelectorAll(".number.button");
@@ -144,6 +157,9 @@ operatorButtons.forEach((button) => {
 
             // Reset boolean to indicate result is no longer stored.
             resultStored = false;
+
+            // Reset boolean to indicate a decimal point is no longer stored.
+            decimalStored = false;
         }
     })
 })
