@@ -32,8 +32,12 @@ function updateDisplay(operator, firstNumber, secondNumber) {
     // Get display element.
     const display = document.querySelector(".display"); 
 
+    // Check if user has divided by zero.
+    if (firstNumber === "Infinity") {
+        display.textContent = "Error: Cannot divide by zero!";
+    }
     // Update the display text with the current input.
-    display.textContent = `${firstNumber} ${operator} ${secondNumber}`;
+    else display.textContent = `${firstNumber} ${operator} ${secondNumber}`;
 }
 
 function getButtonValue(event) {
@@ -90,10 +94,14 @@ function getResult() {
     // Check that the full expression exists before finding the result.
     if (operator && firstNumber && secondNumber) {
         // If either number ends with a decimal point, update the number by concatenating a zero at the end.
-        if (firstNumber.slice(-1) === ".") firstNumber += "0";
-        if (secondNumber.slice(-1) === ".") secondNumber += "0";
+        if (firstNumber.slice(-1) === ".") {
+            firstNumber += "0";
+        }
+        if (secondNumber.slice(-1) === ".") {
+            secondNumber += "0";
+        }
 
-        // Get and print the result of expression - convert string variables storing numbers to numbers.
+        // Get and print the result of expression - convert string variables storing to numbers.
         const result = operate(operator, +firstNumber, +secondNumber);
         
         // Reset second number and operator variables
@@ -145,7 +153,7 @@ equalsButton.addEventListener("click", () => {
         updateDisplay(operator, firstNumber, secondNumber);
 
         // If divided by zero, do not allow any further operators to be typed.
-        if (firstNumber === Infinity) operatorLocked = true;
+        if (firstNumber === "Infinity") operatorLocked = true;
 })
 
 const clearButton = document.querySelector("#clear");
@@ -158,7 +166,7 @@ clearButton.addEventListener("click", () => {
 
 const decimalButton = document.querySelector("#decimal");
 decimalButton.addEventListener("click", (event) => {
-    // Confirm no decimal point is already present.
+    // Confirm no decimal point is already present in the current number.
     if (!decimalPresent) {
         updateNumberVariable(event);
         updateDisplay(operator, firstNumber, secondNumber);
