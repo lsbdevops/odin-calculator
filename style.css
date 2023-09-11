@@ -36,10 +36,17 @@ html, body {
 }
 
 .display {
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    box-sizing: border-box;
     min-width: 400px;
     min-height: 100px;
     border: 1px solid;
     background-color: lightblue;
+    padding: 20px;
+    font-size: 36pt;
+    
 }
 
 .button-row {

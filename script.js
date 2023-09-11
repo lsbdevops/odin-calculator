@@ -138,6 +138,12 @@ function getResult(operator, firstNumber, secondNumber) {
 }
 
 function deleteFromDisplay() {
+    // Check if the character to be deleted is a decimal point, and if so switch decimal present boolean.
+    const currentDisplay = `${calculator.firstNumber}${calculator.operator}${calculator.secondNumber}`;
+    if (currentDisplay.slice(-1) === ".") {
+        calculator.decimalPresent = false;
+    }
+
     // Check which variable needs to be targetted for deletion.
     if (!calculator.firstNumberStored) {
         if (!(calculator.firstNumber === "0")) {
