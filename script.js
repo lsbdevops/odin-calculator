@@ -45,17 +45,34 @@ function getButtonValue(event) {
 }
 
 function updateNumberVariable(event) {
+    const buttonValue = getButtonValue(event);
+
+    // If the button value is 0, do not add an additional zero if zero is the only number stored.
+    if ((buttonValue === "0") && (calculator.firstNumber === "0" || calculator.secondNumber == "0")) {
+        return;
+    }
+
     if (!calculator.firstNumberStored) {
-        calculator.firstNumber += getButtonValue(event);
+        if (calculator.firstNumber === "0") {
+            calculator.firstNumber = buttonValue;
+        }
+        else {
+            calculator.firstNumber += buttonValue;
+        }
     }
     else if (!calculator.resultStored) {
-        calculator.secondNumber += getButtonValue(event);
+        if (calculator.secondNumber === "0") {
+            calculator.secondNumber = buttonValue;
+        }
+        else {
+            calculator.secondNumber += buttonValue;
+        }
     }
     // If number button is pressed directly after result is displayed,
     // start a new calculation with the number input.
     else {
         resetCalcVariables(true);
-        calculator.firstNumber += getButtonValue(event);
+        calculator.firstNumber += buttonValue;
     }
 }
 
@@ -86,7 +103,7 @@ function resetCalcVariables(fullReset) {
     calculator.decimalPresent = false;
 
     if (fullReset) {
-        calculator.firstNumber = "";
+        calculator.firstNumber = "0";
         calculator.firstNumberStored = false;
         calculator.operatorLocked = false;
     }
@@ -120,7 +137,7 @@ function getResult(operator, firstNumber, secondNumber) {
 
 // Declare initial values for variables required in an object.
 const calculator = {
-    firstNumber: "",
+    firstNumber: "0",
     secondNumber: "",
     operator: "",
     firstNumberStored: false,
