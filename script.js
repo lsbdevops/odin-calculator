@@ -52,6 +52,8 @@ function updateNumberVariable(event) {
         return;
     }
 
+    // Check if the current number is zero only, if so replace with this with the current
+    // number input, otherwise concatenate the value.
     if (!calculator.firstNumberStored) {
         if (calculator.firstNumber === "0") {
             calculator.firstNumber = buttonValue;
@@ -135,6 +137,29 @@ function getResult(operator, firstNumber, secondNumber) {
     return firstNumber;
 }
 
+function deleteFromDisplay() {
+    // Check which variable needs to be targetted for deletion.
+    if (!calculator.firstNumberStored) {
+        if (!(calculator.firstNumber === "0")) {
+            calculator.firstNumber = calculator.firstNumber.slice(0, -1);
+        }
+        // If last digit is erased, replace with a zero.
+        if (calculator.firstNumber === "") {
+            calculator.firstNumber = "0";
+        }
+    }
+    else if (calculator.secondNumber) {
+        if (!(calculator.secondNumber === "0")) {
+            calculator.secondNumber = calculator.secondNumber.slice(0, -1);
+        }
+    }
+    else {
+        calculator.operator = "";
+        // Allow for first number to be erased with the next backspace.
+        calculator.firstNumberStored = false;
+    }
+}
+
 // Declare initial values for variables required in an object.
 const calculator = {
     firstNumber: "0",
@@ -184,7 +209,6 @@ clearButton.addEventListener("click", () => {
     updateDisplay();
 })
 
-
 const decimalButton = document.querySelector("#decimal");
 decimalButton.addEventListener("click", (event) => {
     // Confirm no decimal point is already present in the current number.
@@ -193,4 +217,10 @@ decimalButton.addEventListener("click", (event) => {
         updateDisplay();
         calculator.decimalPresent = true;
     }
+})
+
+const deleteButton = document.querySelector("#delete");
+deleteButton.addEventListener("click", () => {
+    deleteFromDisplay();
+    updateDisplay();
 })
