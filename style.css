@@ -1,6 +1,7 @@
 html, body {
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .wrapper {
@@ -20,14 +21,19 @@ html, body {
     height: 800px;
     border: 1px solid;
     border-radius: 40px;
+    background-color: rgb(189, 202, 214);
 }
 
 .logo {
     flex: 1 0 100%;
     max-width: 400px;
     max-height: 100px;
-    border: 1px solid;
     text-align: center;
+    background-color: orange;
+    color: antiquewhite;
+    border-radius: 40px;
+    width: 50%;
+    font-weight: bold;
 }
 
 .logo > p {
@@ -44,7 +50,7 @@ html, body {
     min-height: 100px;
     border: 1px solid;
     background-color: lightblue;
-    padding: 20px;
+    padding: 10px;
     font-size: 36pt;
     
 }
@@ -73,8 +79,10 @@ html, body {
     justify-content: center;
     align-items: center;
     flex: 1 1 100%;
-    border: 1px solid;
+    border: 1px solid black;
     font-size: 28px;
+    font-weight: bold;
+    color: white;
 }
 
 .button {
@@ -85,4 +93,28 @@ html, body {
 .top-button {
     max-width: 150px;
     height: 50px;
+}
+
+.number.button {
+    background-color: slategray;
+}
+
+.operator.button {
+    background-color: darkslateblue;
+}
+
+#equals {
+    background-color: green;
+}
+
+#decimal {
+    background-color: rgb(116, 116, 116);
+}
+
+#clear {
+    background-color: darkred;
+}
+
+#delete {
+    background-color: red;
 }

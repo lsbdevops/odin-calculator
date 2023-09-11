@@ -37,7 +37,9 @@ function updateDisplay() {
         display.textContent = "Error: Cannot divide by zero!";
     }
     // Update the display text with the current input.
-    else display.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber}`;
+    else {
+        display.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber}`;
+    }
 }
 
 function getButtonValue(event) {
