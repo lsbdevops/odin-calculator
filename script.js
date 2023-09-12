@@ -21,9 +21,9 @@ function operate(operator, firstNumber, secondNumber) {
             return add(firstNumber, secondNumber);
         case "-":
             return subtract(firstNumber, secondNumber);
-        case "*":
+        case "×":
             return multiply(firstNumber, secondNumber);
-        case "/":
+        case "÷":
             return divide(firstNumber, secondNumber);
     }
 }
