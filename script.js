@@ -29,16 +29,17 @@ function operate(operator, firstNumber, secondNumber) {
 }
 
 function updateDisplay() {
-    // Get display element.
-    const display = document.querySelector(".display"); 
+    // Get display elements.
+    const lowerDisplay = document.querySelector(".display-lower"); 
+    const upperDisplay = document.querySelector(".display-upper"); 
 
     // Check if user has divided by zero.
     if (calculator.firstNumber === "Infinity") {
-        display.textContent = "Error: Cannot divide by zero!";
+        lowerDisplay.textContent = "Error: Cannot divide by zero!";
     }
     // Update the display text with the current input.
     else {
-        display.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber}`;
+        lowerDisplay.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber}`;
     }
 }
 
@@ -76,7 +77,7 @@ function updateNumberVariable(event) {
     // start a new calculation with the number input.
     else {
         resetCalcVariables(true);
-        calculator.firstNumber += buttonValue;
+        calculator.firstNumber = buttonValue;
     }
 }
 
@@ -136,7 +137,7 @@ function getResult(operator, firstNumber, secondNumber) {
     }
 
     // Otherwise return first number unchanged.
-    return firstNumber;
+    return [firstNumber, calculator.firstNumberStored];
 }
 
 function deleteFromDisplay() {
