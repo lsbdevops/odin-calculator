@@ -71,16 +71,22 @@ function updateNumberVariable(event) {
     // Check if the current number is zero only, if so replace with this with the current
     // number input, otherwise concatenate the value.
     if (!calculator.firstNumberStored) {
-        if (calculator.firstNumber === "0") {
+        if (calculator.firstNumber === "0" && buttonValue != ".") {
             calculator.firstNumber = buttonValue;
+        }
+        else if (!calculator.firstNumber && buttonValue === ".") {
+            calculator.firstNumber = "0" + buttonValue;
         }
         else {
             calculator.firstNumber += buttonValue;
         }
     }
     else if (!calculator.resultStored) {
-        if (calculator.secondNumber === "0") {
+        if (calculator.secondNumber === "0" && buttonValue != ".") {
             calculator.secondNumber = buttonValue;
+        }
+        else if (!calculator.secondNumber && buttonValue === ".") {
+            calculator.secondNumber = "0" + buttonValue;
         }
         else {
             calculator.secondNumber += buttonValue;
