@@ -28,19 +28,32 @@ function operate(operator, firstNumber, secondNumber) {
     }
 }
 
-function updateDisplay() {
+function updateDisplay(result) {
     // Get display elements.
     const lowerDisplay = document.querySelector(".display-lower"); 
     const upperDisplay = document.querySelector(".display-upper"); 
 
-    // Check if user has divided by zero.
-    if (calculator.firstNumber === "Infinity") {
+    // Check if user has divided by zero (note: infinity may be a string or number).
+    if (calculator.firstNumber === "Infinity" || result === "Infinity") {
         lowerDisplay.textContent = "Error: Cannot divide by zero!";
+        upperDisplay.textContent = "";
     }
-    // Update the display text with the current input.
-    else {
-        lowerDisplay.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber}`;
+    else if (!calculator.operator) {
+        lowerDisplay.textContent = `${calculator.firstNumber}`;
+        upperDisplay.textContent = "";
     }
+    else if (!calculator.secondNumber) {
+        upperDisplay.textContent = `${calculator.firstNumber} ${calculator.operator}`;
+        lowerDisplay.textContent = "";
+    }
+    else if (!result) {
+        lowerDisplay.textContent = `${calculator.secondNumber}`;
+    }
+    else if (result) {
+        upperDisplay.textContent = `${calculator.firstNumber} ${calculator.operator} ${calculator.secondNumber} =`
+        lowerDisplay.textContent = `${result}`;
+    }
+
 }
 
 function getButtonValue(event) {
@@ -120,20 +133,21 @@ function getResult(operator, firstNumber, secondNumber) {
     if (operator && firstNumber && secondNumber) {
         // If either number ends with a decimal point, update the number by concatenating a zero at the end.
         if (firstNumber.slice(-1) === ".") {
-            firstNumber += "0";
+            calculator.firstNumber += "0";
         }
         if (secondNumber.slice(-1) === ".") {
-            secondNumber += "0";
+            calculator.secondNumber += "0";
         }
 
-        // Get and print the result of expression - convert string variables storing to numbers.
-        const result = operate(operator, +firstNumber, +secondNumber);
-        
+        // Get and print the result of expression - convert string variables to numbers. Return the result as a string.
+        const result = operate(operator, +firstNumber, +secondNumber).toString();
+        updateDisplay(result)
+
         // Reset second number, operator and decimal boolean variables.
         resetCalcVariables(false);
 
         // Convert result back to a string so string methods may be used. Confirm result was stored.
-        return [result.toString(), true];    
+        return [result, true];    
     }
 
     // Otherwise return first number unchanged.
@@ -141,6 +155,10 @@ function getResult(operator, firstNumber, secondNumber) {
 }
 
 function deleteFromDisplay() {
+    if (calculator.firstNumber === "Infinity") {
+        return;
+    }
+
     // Check if the character to be deleted is a decimal point, and if so switch decimal present boolean.
     const currentDisplay = `${calculator.firstNumber}${calculator.operator}${calculator.secondNumber}`;
     if (currentDisplay.slice(-1) === ".") {
@@ -203,7 +221,6 @@ equalsButton.addEventListener("click", () => {
         // Allow carryover of result to first number variable and update display.
         [calculator.firstNumber, calculator.resultStored] = getResult(calculator.operator, 
             calculator.firstNumber, calculator.secondNumber);
-        updateDisplay();
 
         // If divided by zero, do not allow any further operators to be typed.
         if (calculator.firstNumber === "Infinity") {
