@@ -68,21 +68,30 @@ function updateNumberVariable(event) {
         return;
     }
 
-    // Check if the current number is zero only, if so replace with this with the current
-    // number input, otherwise concatenate the value.
     if (!calculator.firstNumberStored) {
-        if (calculator.firstNumber === "0" && buttonValue != ".") {
+        // If the number length exceeds the display area (i.e, 14 numbers), do not allow any further numbers
+        // to be stored.
+        if (calculator.firstNumber.length >= 14) {
+            return
+        }
+        // Check if the current number is zero only, if so replace with this with the current number input.
+        else if (calculator.firstNumber === "0" && buttonValue != ".") {
             calculator.firstNumber = buttonValue;
         }
+        // Add leading 0 if decimal point is input with no prior number input.
         else if (!calculator.firstNumber && buttonValue === ".") {
             calculator.firstNumber = "0" + buttonValue;
         }
+        // Otherwise, concatenate the value.
         else {
             calculator.firstNumber += buttonValue;
         }
     }
     else if (!calculator.resultStored) {
-        if (calculator.secondNumber === "0" && buttonValue != ".") {
+        if (calculator.secondNumber.length >= 14) {
+            return
+        }
+        else if (calculator.secondNumber === "0" && buttonValue != ".") {
             calculator.secondNumber = buttonValue;
         }
         else if (!calculator.secondNumber && buttonValue === ".") {
@@ -134,6 +143,48 @@ function resetCalcVariables(fullReset) {
 
 }
 
+function round(numberString, maxLength) {
+    let beforeDecimal;
+    let afterDecimal; 
+    let exponential;
+
+    if (numberString.search(/\./) === -1) {
+        beforeDecimal = numberString;
+    }
+    else {
+        // Use a regex to get the digits before and after the decimal point.
+        [,beforeDecimal, afterDecimal, exponential] = /(\d+)(\.\d+)(e\+\d\d)?/.exec(numberString);
+    }
+
+    // Check if the digits before the decimal are greater than the overflow limit. 
+    if (beforeDecimal.length > maxLength) {
+        // Remove required number of trailing digits (ensure an additional removed to account for 
+        // exponential format characters).
+        let reducedNumber = beforeDecimal / Math.pow(10, ((5 + beforeDecimal.length) - maxLength));
+        reducedNumber = Math.round(reducedNumber);
+        reducedNumber *= Math.pow(10, ((5 + beforeDecimal.length) - maxLength));
+
+        // Return number in exponential form.
+        return Number(reducedNumber).toExponential();
+    }
+    else {
+        // Round the after decimal digits to the maximum allowable number of digits.
+        const exponentialCharacters = (exponential) ? 4 : 0;
+        let roundedDecimal = parseFloat(afterDecimal).toFixed(maxLength - beforeDecimal.length
+            - exponentialCharacters);
+
+        // Join back the number, ensure any trailing zeros are removed and return as a string.
+        let roundedNumber = parseFloat(beforeDecimal + roundedDecimal.slice(1));
+        roundedNumber = roundedNumber.toString();
+
+        if (exponential) {
+            roundedNumber += exponential;
+        }
+
+        return roundedNumber;
+    }
+}
+
 function getResult(operator, firstNumber, secondNumber) {
     // Check that the full expression exists before finding the result.
     if (operator && firstNumber && secondNumber) {
@@ -146,7 +197,14 @@ function getResult(operator, firstNumber, secondNumber) {
         }
 
         // Get and print the result of expression - convert string variables to numbers. Return the result as a string.
-        const result = operate(operator, +firstNumber, +secondNumber).toString();
+        let result = operate(operator, +firstNumber, +secondNumber).toString();
+
+        // Ensure result does not overflow the calculator (maximum 14 characters including decimal) 
+        // - round result if required.
+        if (result.length > 13) {
+           result = round(result.toString(), 14); 
+        }
+
         updateDisplay(result)
 
         // Reset second number, operator and decimal boolean variables.
