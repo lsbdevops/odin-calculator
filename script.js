@@ -216,7 +216,7 @@ function getResult(operator, firstNumber, secondNumber) {
     }
 
     // Otherwise return first number unchanged.
-    return [firstNumber, calculator.firstNumberStored];
+    return [firstNumber, false];
 }
 
 function deleteFromDisplay() {
