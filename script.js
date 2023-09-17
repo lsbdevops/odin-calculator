@@ -60,9 +60,7 @@ function getButtonValue(event) {
     return event.target.dataset.value;
 }
 
-function updateNumberVariable(event) {
-    const buttonValue = getButtonValue(event);
-
+function updateNumberVariable(buttonValue) {
     // If the button value is 0, do not add an additional zero if zero is the only number stored.
     if ((buttonValue === "0") && (calculator.firstNumber === "0" || calculator.secondNumber == "0")) {
         return;
@@ -109,7 +107,7 @@ function updateNumberVariable(event) {
     }
 }
 
-function updateOperatorVariable(event) {
+function updateOperatorVariable(buttonValue) {
     // If there's an input for both first and second numbers in the expression, evaluate
     // the result first.
     if (calculator.firstNumber && calculator.secondNumber) {
@@ -117,7 +115,7 @@ function updateOperatorVariable(event) {
             calculator.firstNumber, calculator.secondNumber);
     }
     if (calculator.firstNumber && !calculator.secondNumber && !calculator.operatorLocked) {
-        calculator.operator = getButtonValue(event);
+        calculator.operator = buttonValue;
 
         // Update boolean to indicate first number has been stored.
         calculator.firstNumberStored = true;
@@ -147,7 +145,8 @@ function round(numberString, maxLength) {
     let beforeDecimal;
     let afterDecimal; 
     let exponential;
-
+    
+    // Check if result contains a decimal place.
     if (numberString.search(/\./) === -1) {
         beforeDecimal = numberString;
     }
@@ -158,7 +157,7 @@ function round(numberString, maxLength) {
 
     // Check if the digits before the decimal are greater than the overflow limit. 
     if (beforeDecimal.length > maxLength) {
-        // Remove required number of trailing digits (ensure an additional removed to account for 
+        // Remove required number of trailing digits (ensure additional digits removed to account for 
         // exponential format characters).
         let reducedNumber = beforeDecimal / Math.pow(10, ((5 + beforeDecimal.length) - maxLength));
         reducedNumber = Math.round(reducedNumber);
@@ -169,6 +168,7 @@ function round(numberString, maxLength) {
     }
     else {
         // Round the after decimal digits to the maximum allowable number of digits.
+        // Account for expontential character length if required.
         const exponentialCharacters = (exponential) ? 4 : 0;
         let roundedDecimal = parseFloat(afterDecimal).toFixed(maxLength - beforeDecimal.length
             - exponentialCharacters);
@@ -176,7 +176,8 @@ function round(numberString, maxLength) {
         // Join back the number, ensure any trailing zeros are removed and return as a string.
         let roundedNumber = parseFloat(beforeDecimal + roundedDecimal.slice(1));
         roundedNumber = roundedNumber.toString();
-
+        
+        // If the input was in exponential form, concatenate the exponential characters.
         if (exponential) {
             roundedNumber += exponential;
         }
@@ -251,6 +252,17 @@ function deleteFromDisplay() {
     }
 }
 
+function equals() {
+    // Allow carryover of result to first number variable and update display.
+    [calculator.firstNumber, calculator.resultStored] = getResult(calculator.operator, 
+        calculator.firstNumber, calculator.secondNumber);
+
+    // If divided by zero, do not allow any further operators to be typed.
+    if (calculator.firstNumber === "Infinity") {
+        calculator.operatorLocked = true;
+    }
+}
+
 // Declare initial values for variables required in an object.
 const calculator = {
     firstNumber: "0",
@@ -266,7 +278,7 @@ const calculator = {
 const numberButtons = document.querySelectorAll(".number.button");
 numberButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-        updateNumberVariable(event);
+        updateNumberVariable(getButtonValue(event));
         updateDisplay();
     })
 })
@@ -275,21 +287,14 @@ numberButtons.forEach((button) => {
 const operatorButtons = document.querySelectorAll(".operator.button");
 operatorButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
-        updateOperatorVariable(event);
+        updateOperatorVariable(getButtonValue(event));
         updateDisplay();
     })
 })
 
 const equalsButton = document.querySelector("#equals");
 equalsButton.addEventListener("click", () => {
-        // Allow carryover of result to first number variable and update display.
-        [calculator.firstNumber, calculator.resultStored] = getResult(calculator.operator, 
-            calculator.firstNumber, calculator.secondNumber);
-
-        // If divided by zero, do not allow any further operators to be typed.
-        if (calculator.firstNumber === "Infinity") {
-            calculator.operatorLocked = true;
-        }
+        equals();
 })
 
 const clearButton = document.querySelector("#clear");
@@ -303,7 +308,7 @@ const decimalButton = document.querySelector("#decimal");
 decimalButton.addEventListener("click", (event) => {
     // Confirm no decimal point is already present in the current number.
     if (!calculator.decimalPresent) {
-        updateNumberVariable(event);
+        updateNumberVariable(getButtonValue(event));
         updateDisplay();
         calculator.decimalPresent = true;
     }
@@ -314,3 +319,44 @@ deleteButton.addEventListener("click", () => {
     deleteFromDisplay();
     updateDisplay();
 })
+
+const validNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+const validOperators = ["+", "-", "*", "/"];
+
+window.addEventListener("keydown", (event) => {
+    // Check the key input and perform the required action.
+    let key = event.key;
+
+    if (validNumbers.includes(key)) {
+        updateNumberVariable(key);
+        updateDisplay();
+    }
+    else if(key === ".") {
+        if (!calculator.decimalPresent) {
+            updateNumberVariable(key);
+            updateDisplay();
+            calculator.decimalPresent = true;
+        }
+    }
+    else if (validOperators.includes(key)) {
+        // Convert to the multiplication and division characters.
+        switch(key) {
+            case "*":
+                key = "×";
+                break;
+            case "/":
+                key = "÷";
+                break;
+        }
+        updateOperatorVariable(key);
+        updateDisplay();
+    }
+    else if (key === "=" || key === "Enter") {
+        equals();
+    }
+    else if (key === "Backspace") {
+        deleteFromDisplay();
+        updateDisplay();
+    }
+})
+
